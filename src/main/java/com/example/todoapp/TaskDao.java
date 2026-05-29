@@ -35,4 +35,23 @@ public class TaskDao {
     public Optional<Task> findById(int id) {
         return Optional.ofNullable(storage.get(id));
     }
+    public java.util.List<Task> findAll() {
+        return new java.util.ArrayList<>(storage.values());
+    }
+
+    public java.util.List<Task> findAllTodoOnly() {
+        return storage.values().stream()
+                .filter(task -> !task.done())
+                .toList();
+    }
+
+    public boolean deleteById(int id) {
+        return storage.remove(id) != null;
+    }
+
+    public boolean update(int id, Task task) {
+        if (!storage.containsKey(id)) return false;
+        storage.put(id, task);
+        return true;
+    }
 }
