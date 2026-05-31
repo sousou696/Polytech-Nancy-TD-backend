@@ -23,7 +23,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/Task'
+                            $ref: '#/components/schemas/TaskCreateDto'
             responses:
                 '201':
                     description: Tâche créée avec succès
@@ -36,20 +36,25 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/Task'
-
+                                $ref: '#/components/schemas/TaskResponseDto'
+                '400':
+                    description: Paramètre invalide
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorDto'
         get:
             tags: [ tasks ]
             summary: Récupérer toutes les tâches
             operationId: getTasks
             parameters:
-                - in: query
-                  name: todo-only
-                  required: false
-                  description: Si true, retourne uniquement les tâches non faites
-                  schema:
-                      type: boolean
-                      example: true
+                -   in: query
+                    name: todo-only
+                    required: false
+                    description: Si true, retourne uniquement les tâches non faites
+                    schema:
+                        type: boolean
+                        example: true
             responses:
                 '200':
                     description: Tâches trouvées
@@ -58,7 +63,7 @@ paths:
                             schema:
                                 type: array
                                 items:
-                                    $ref: '#/components/schemas/Task'
+                                    $ref: '#/components/schemas/TaskResponseDto'
                 '204':
                     description: Aucune tâche trouvée
 
@@ -82,7 +87,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/Task'
+                                $ref: '#/components/schemas/TaskResponseDto'
                 '404':
                     description: Tâche non trouvée
         delete:
@@ -94,21 +99,28 @@ paths:
                     description: Tâche supprimée avec succès
                 '404':
                     description: Tâche non trouvée
-            put:
-                tags: [ tasks ]
-                summary: Modifier une tâche
-                operationId: updateTaskById
-                requestBody:
-                    required: true
+        put:
+            tags: [ tasks ]
+            summary: Modifier une tâche
+            operationId: updateTaskById
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/TaskUpdateDto'
+            responses:
+                '204':
+                    description: Tâche modifiée avec succès
+                '404':
+                    description: Tâche non trouvée
+                '400':
+                    description: Paramètre invalide
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/Task'
-                responses:
-                    '204':
-                        description: Tâche modifiée avec succès
-                    '404':
-                        description: Tâche non trouvée
+                                $ref: '#/components/schemas/ErrorDto'
+
 components:
     schemas:
         Task:
@@ -133,3 +145,56 @@ components:
             required:
                 - id
                 - title
+        TaskResponseDto:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    example: 1
+                title:
+                    type: string
+                    example: Acheter du lait
+                description:
+                    type: string
+                    example: 2L demi-écrémé
+                done:
+                    type: boolean
+                    example: false
+        TaskCreateDto:
+            type: object
+            properties:
+                title:
+                    type: string
+                    maxLength: 50
+                    example: Acheter du lait
+                description:
+                    type: string
+                    maxLength: 255
+                    example: 2L demi-écrémé
+            required:
+                - title
+        TaskUpdateDto:
+            type: object
+            properties:
+                title:
+                    type: string
+                    maxLength: 50
+                    example: Acheter du lait
+                description:
+                    type: string
+                    maxLength: 255
+                    example: 2L demi-écrémé
+                done:
+                    type: boolean
+                    example: false
+            required:
+                - title
+        ErrorDto:
+            type: object
+            properties:
+                field:
+                    type: string
+                    example: title
+                message:
+                    type: string
+                    example: Le titre est obligatoire et doit faire maximum 50 caractères
